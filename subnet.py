@@ -4,17 +4,26 @@
 	Takes in a list of the seperate octets of an Ip/subnetmask
 	e.g. ['192','168','0','0']
 	and converts them to a list of those octets in binary
+
+	listOct: list of octets represented as strings
+
+	returns same list with octets represented in binary
 '''
-def makeBinList(list):
+def makeBinList(listOct):
 	binList = []
 
-	for i in list:
+	for i in listOct:
 		binList.append( bin ( int(i) )[2::])#[2::] removes the 0b prefix
 
 	return binList
 '''
 	Takes in a list of binary octets and makes sure that leading zeroes are
 	added to make them 8 bit numbers
+
+	binList: list of octets represented in binary
+
+	returns same list with the length of all octets being 8 (0's appended in front to force) 
+
 '''
 def leadZero(binList):
 	
@@ -29,19 +38,37 @@ def leadZero(binList):
 	return binList
 
 '''
-	Takes in a two binary strings and returns a binary string of a bitwise add
+	Takes in a two binary strings and returns a binary string of a bitwise AND
 	Under the assumption that both strings are 8 bits long including leading zeroes
+
+	op1: binary string
+	op2: binary string
+
+	returns bitwise AND of binary numbers
 '''
 def bitWiseAdd( op1, op2 ):
 
 	result = "";	
-	#print "Op1: " + op1
-	#print "Op2: " + op2
 	for i in range(0, len(op1)):
-		result = result + str(int(op1[i]) & int(op2[i]))
+		result = result + str(int(op1[i]) & int(op2[i])) #Appends answers one at a time
 
 	return result
-		
+
+
+'''
+	Computes the CIDR notation of the subnet utilizing the local IP and subnet mask
+
+	mask: subnet mask
+
+	returns the CIDR:
+
+	e.g.
+		192.168.56.104 
+	      & 255.255.255.0
+
+	      	returns 24
+
+'''		
 def getCIDR(mask):
 	
 	[oct1, oct2, oct3, oct4] = mask.split(".")
@@ -61,9 +88,17 @@ def getCIDR(mask):
 				count += 1
 	return count
 
+'''
+	Uses the Ip address and subnet mask to get a full CIDR representation of the LAN
 
-#mask = "255.255.255.0"
-#ip = "192.168.56.104"
+	ip: localhost IP address (e.g. 192.168.56.104)
+	mask: subnet mask
+
+	returns CIDR as a string
+
+	e.g.
+		192.168.56.0/24
+'''
 
 def getSubnet(ip, mask):
 	[oct1, oct2, oct3, oct4] = mask.split(".")
