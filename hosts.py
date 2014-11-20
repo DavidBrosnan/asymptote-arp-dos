@@ -26,26 +26,6 @@ def getIPMaskMAC(interface):
 
 	return trip
 
-''' 
-	Helps hostdiscover cut down the list of ip addresses
-
-	x: string representing IP address of host were trying to contact
-
-	host: string representing IP of localhost
-
-	interface: 
-	
-'''
-
-def determine(x, host, interface):
-
-	#Equivalence of an arping, sends out a broadcast asking who the IP address is
-	ans, unans = srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst=x), iface=interface,verbose=0, timeout = 0.000000000000000000000000000000000000000000000001)
-	if ans or x == host: 	#If we recieved an answer(its up) or its the host(we dont answer ourself)
-		 return True
-	else:
-		return False
-	
 '''
 	Uses arping style discovery to reduce list of subnet to guaranteed online hosts
 
@@ -65,10 +45,19 @@ def hostDiscover(interface, subnet, host):
 	for ip in range(0, len(ipList)):
 		ipList[ip] = str(ipList[ip])
 
+	ipDict = {}
 
-	ipList = [ip for ip in ipList if determine(ip, host, interface)]  #Create new list of online hosts
+	ans,unans=srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst="192.168.1.0/24"),iface= "eth2",timeout=3)
+	    
+	for s,r in ans:
+        	#print r.sprintf("%19s,Ether.src% %ARP.psrc%")
+		#print r[Ether].src
+		#print r[ARP].psrc
+		ipDict[r[ARP].psrc] = r[Ether].src 
 
-	return ipList
+	#ipList = [ip for ip in ipList if determine(ip, host, interface)]  #Create new list of online hosts
+
+	return ipDict
 
 '''
 	List the hostnames, IP addresses, and MACs of all online hosts in the Local Area Network
@@ -86,7 +75,12 @@ def getNetwork(interface):
 		
 	subnet = getSubnet(hostIP, hostMask) #(IP, Mask, MAC)
 	
-	ipList = hostDiscover(interface, subnet, hostIP)
+	ipMACList = hostDiscover(interface, subnet, hostIP)
+
+	ipList = []
+
+	for k, v in ipMACList.iteritems():
+		ipList.append(k)
 
 	nm = NmapProcess(ipList,"-sn","-Pn") #Run Nmap scan of online hosts
 	rc = nm.run()
@@ -126,4 +120,4 @@ def getNetwork(interface):
 	print 
 
 
-getNetwork("eth0")
+getNetwork("eth2")

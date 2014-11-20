@@ -21,7 +21,7 @@ killMAC = "08:00:27:ff:ff:fe"		#False MAC address
 
 #Ethernet*****************
 pkt = Ether()/ARP()	
-pkt.dst = victimsMAC		#Ethernet Destination
+pkt.dst = victimMAC		#Ethernet Destination
 pkt.src = myMAC			#Ethernet Source
 #*************************
 
