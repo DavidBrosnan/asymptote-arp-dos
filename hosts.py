@@ -104,6 +104,15 @@ def getNetwork(interface):
 			if hosts.address == hostIP: #if it's the host
 				machines[hosts.address][0] = hostMAC
 				machines[hosts.address][1] = "**LocalHost**" + machines[hosts.address][1]
+	
+	#if verbose/scan
+
+	printHosts(machines, subnet)
+	
+	return machines
+
+def printHosts(machines, subnet):
+	
 	print
 	
 	print "Subnet: " + subnet
@@ -117,7 +126,7 @@ def getNetwork(interface):
 	for key, value in sorted(machines.iteritems()):
         	print "{:>40} {: >20} {:>20}".format(value[1],key,value[0])
 	
-	print 
+	print
 
-interface = raw_input("Interface: ")
-getNetwork(interface)
+#interface = raw_input("Interface: ")
+#getNetwork(interface)

