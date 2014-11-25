@@ -54,7 +54,7 @@ print("Turn out the lights....")
 
 try:
 	while True:
-		sendp(pkt, iface="eth0")
+		sendp(pkt, iface=interface)
 		time.sleep(2)
 
 except KeyboardInterrupt:
@@ -69,7 +69,7 @@ except KeyboardInterrupt:
 	heal.op = 2
 
 	for i in range(0, 5):
-		sendp(heal, iface="eth0")
+		sendp(heal, iface=interface)
 		time.sleep(1)
 
 	sys.exit(0)
