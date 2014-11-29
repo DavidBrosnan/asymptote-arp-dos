@@ -47,7 +47,7 @@ def hostDiscover(interface, subnet, host):
 
 	ipDict = {}
 
-	ans,unans=srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst="192.168.56.0/24"),iface= interface,verbose=1,timeout=3)
+	ans,unans=srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst=subnet),iface= interface,verbose=1,timeout=3)
 	    
 	for s,r in ans:
         	#print r.sprintf("%19s,Ether.src% %ARP.psrc%")
