@@ -8,7 +8,7 @@ import netifaces
 import subprocess
 from netaddr import IPNetwork
 from scapy.all import *
-
+import socket
 
 ''' Get the Local IP address, Subnet Mask, and Local MAC of a given interface
 '''
@@ -53,9 +53,19 @@ def hostDiscover(interface, subnet, host):
         	#print r.sprintf("%19s,Ether.src% %ARP.psrc%")
 		#print r[Ether].src
 		#print r[ARP].psrc
-		ipDict[r[ARP].psrc] = r[Ether].src 
+		ipDict[r[ARP].psrc] = [r[Ether].src,"Unknown"]
+		try:
+			hostname = socket.gethostbyaddr(r[ARP].psrc)
+			print "hostname " + hostname
+			ipDict[r[ARP].psrc][1] = hostname
+		except socket.herror:
+			print "wat"
+			
+	for k, v in ipDict.iteritems():
+		print k + "\t" + v[0] + "\t" + v[1]
 
 	#ipList = [ip for ip in ipList if determine(ip, host, interface)]  #Create new list of online hosts
+	sys.exit(0)
 
 	return ipDict
 
@@ -82,7 +92,10 @@ def getNetwork(interface):
 	for k, v in ipMACList.iteritems():
 		ipList.append(k)
 
-	nm = NmapProcess(ipList,"-sn","-Pn") #Run Nmap scan of online hosts
+	
+	'''
+
+	nm = NmapProcess(ipList,"-sn","-Pn","--max-retries 1") #Run Nmap scan of online hosts
 	rc = nm.run()
 
 	machines = {}
@@ -110,6 +123,7 @@ def getNetwork(interface):
 	printHosts(machines, subnet)
 	
 	return machines
+'''
 
 def printHosts(machines, subnet):
 	
@@ -128,5 +142,5 @@ def printHosts(machines, subnet):
 	
 	print
 
-#interface = raw_input("Interface: ")
-#getNetwork(interface)
+interface = raw_input("Interface: ")
+getNetwork(interface)
