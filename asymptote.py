@@ -14,7 +14,7 @@ import subnet
 @click.argument('iprange', default='subnet')
 def cli(iface, scan, poison, verbose, iprange):
 	"""Asymptote LAN DOS attacker"""
-	print "iface = %s\nscan = %s\npoison = %s\nverbose = %s\nipRange = %s" % (iface,scan,poison,verbose, iprange)
+	#print "iface = %s\nscan = %s\npoison = %s\nverbose = %s\nipRange = %s" % (iface,scan,poison,verbose, iprange)
 
 	if iface == 'prompt':
 		subnet.printInterfaces()
@@ -26,21 +26,8 @@ def cli(iface, scan, poison, verbose, iprange):
 	victims = hosts.getTargets(iface, iprange, scan, verbose)
 			
 	if poison != 'poison':
-		DenialOfService(iface, victims, verbose)
-	#Scan and poison, scan the range and prompt user for attack range
-    	#if scan != 0 and poison:
-	#	pass
-	 
-	#Error Please select a scan or poison option
-	#elif scan == 0 and not poison:
-	#	pass	
-	
-	#elif scan != 0: #and !poison:
-	#	hosts.getTargets(iface, iprange, scan, verbose, False)
-			
-	#elif poison: #and scan == 0
-	#	victims = getTargets(interface, targetString, 0, verbose, True)
-	#	DenialOfService(iface, victims, verbose)
+		quarantine = hosts.scanTarget(iface, poison)
+		DenialOfService(iface, victims, quarantine, verbose)
 
 if __name__ == '__main__':
     cli()

@@ -8,6 +8,8 @@ import netifaces
 import subprocess
 from netaddr import IPNetwork
 from netaddr import IPAddress
+import 	logging
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
 import socket
 
@@ -68,6 +70,16 @@ def parseTargets(IPstring, interface):
 		
 	return targets
 
+
+def scanTarget(interface, target):
+	ans,unans=srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst=target),iface= interface,verbose=0,timeout=3)
+
+	result = ()	
+
+	for s,r in ans:
+		result=(r[ARP].psrc, r[Ether].src)
+
+	return result
 '''
 	Uses arping style discovery to reduce list of subnet to guaranteed online hosts
 	interface: string containing interface to check for hosts
@@ -86,7 +98,7 @@ def hostDiscover(interface, subnet, host):
 	
 	ipDict = {}
 
-	ans,unans=srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst=subnet),iface= interface,verbose=1,timeout=3)
+	ans,unans=srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst=subnet),iface= interface,verbose=0,timeout=3)
 	    
 	for s,r in ans:
 
@@ -138,8 +150,8 @@ def getTargets(interface, targetString, scan, verbose):
 	
 	nmap_report = NmapParser.parse(nm.stdout)
 	
-	for hosts in nmap_report.hosts:
-		print hosts
+	#for hosts in nmap_report.hosts:
+		#print hosts
 	for hosts in nmap_report.hosts:
         	if hosts.is_up():
 			if len(hosts.hostnames) != 0: #If we got a hostName from Nmap
@@ -149,6 +161,7 @@ def getTargets(interface, targetString, scan, verbose):
 					else:
 						machines[hosts.address] = [hosts.mac, hosts.hostnames[0], hosts.vendor, "UNKNOWN"]
 
+	
 				else:
 					machines[hosts.address] = [hosts.mac, hosts.hostnames[0]]
 			else:	#If we didn't
@@ -184,7 +197,7 @@ def printHosts(machines, subnet, scan):
 	
 	print "Subnet: " + subnet
 	
-	print "Hosts connected: " + str(len(machines))
+	print "Online Hosts scanned: " + str(len(machines))
 	
 	print
 	
