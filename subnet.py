@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 import netifaces
 '''
 	Takes in a list of the seperate octets of an Ip/subnetmask

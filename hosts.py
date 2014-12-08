@@ -1,25 +1,17 @@
 #!/usr/bin/env python
 
-import sys
+from sys import stderr, exit
 from libnmap.parser import NmapParser
 from libnmap.process import NmapProcess
-from subnet import *
-import netifaces
-import subprocess
-from netaddr import IPNetwork
-from netaddr import IPAddress
+from subnet import getIPMaskMAC, getSubnet
 import 	logging
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
-import socket
-
+from netaddr import core, IPNetwork, IPAddress
 '''
 	Takes in a range of IP addresses and returns a list of individual IP's
 '''
 def parseTargets(IPstring, interface):
-
-	#print IPstring
-	#print "************"
 
 	targets = []
 
@@ -39,15 +31,10 @@ def parseTargets(IPstring, interface):
 				
 		hosts = list(IPNetwork(getSubnet(interface)))
 			
-		#for ip in range(0, len(hosts)):
-		#	hosts[ip] = str(hosts[ip])
 
 		for IP in hosts:
 			if IP >= minIP and IP <= maxIP:
-				#print str(IP) + "is inbetween " + str(minIP) + " and " + str(maxIP)
 				targets.append(IP)
-			#else:
-				#print str(IP) + " is not!"
 
 		for ip in range(0, len(targets)):
 			targets[ip] = str(targets[ip])
@@ -67,6 +54,13 @@ def parseTargets(IPstring, interface):
 
 	else:
 		targets.append(IPstring)
+
+	try:
+		for target in targets:
+			ip = IPNetwork(target)
+	except core.AddrFormatError:
+		sys.stderr.write("\nERROR: Invalid scan range\n\n")
+		sys.exit(0)
 		
 	return targets
 
@@ -124,20 +118,11 @@ def getTargets(interface, targetString, scan, verbose):
 	
 	targets = parseTargets(targetString, interface)
 
-	#for k, v in ipMACList.iteritems():
-	#	print k
-
-	#print "*******************"
-
-	#print targets	
-
 	ipList = []
 
 	for k, v in ipMACList.iteritems():
 		if k in targets:
 			ipList.append(k)
-	
-	#print ipList
 	
 	if (scan == 2):
 		nm = NmapProcess(ipList,"-O","-sS")
@@ -150,8 +135,6 @@ def getTargets(interface, targetString, scan, verbose):
 	
 	nmap_report = NmapParser.parse(nm.stdout)
 	
-	#for hosts in nmap_report.hosts:
-		#print hosts
 	for hosts in nmap_report.hosts:
         	if hosts.is_up():
 			if len(hosts.hostnames) != 0: #If we got a hostName from Nmap
@@ -178,14 +161,6 @@ def getTargets(interface, targetString, scan, verbose):
 				machines[hosts.address][0] = hostMAC
 				machines[hosts.address][1] = "**LocalHost**" + machines[hosts.address][1]
 
-	#print machines	
-	#print machines
-
-	#for k, v in machines:
-	#	print k
-	#	print v
-	#	print
-	#if verbose/scan
 	if scan != 0:
 		printHosts(machines, subnet, scan)
 	
@@ -211,7 +186,4 @@ def printHosts(machines, subnet, scan):
         		print "{:>40} {: >20} {:>20}".format(value[1],key,value[0])
 	
 	print
-
-#interface = raw_input("Interface: ")
-#getNetwork(interface)
 

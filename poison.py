@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
+import logging
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
-import time
-import signal
-import sys
-from hosts import * 
+from time import sleep
+from sys import exit
 import netifaces
 
 
@@ -38,10 +38,6 @@ def createPacket(victimIP, victimMAC, deadEndIP, deadEndMAC, poison):
 
 def DenialOfService(interface, victims, quarantine, verbosity):
 
-#	victims = getTargets(interface, targetString, 0, verbose, True)
-
-	#if router in victims:
-	#	del victims[router]	#In case router was selected as a victim
 	qIP = quarantine[0]
 	qMAC = quarantine[1]
 
