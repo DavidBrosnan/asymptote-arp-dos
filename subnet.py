@@ -76,15 +76,11 @@ def getCIDR(mask):
 			if '1' == octs[i][j]:
 				count += 1
 	return count
+	
+'''
+	prints available interfaces
+'''
 
-'''
-	Uses the Ip address and subnet mask to get a full CIDR representation of the LAN
-	ip: localhost IP address (e.g. 192.168.56.104)
-	mask: subnet mask
-	returns CIDR as a string
-	e.g.
-		192.168.56.0/24
-'''
 def printInterfaces():	
 	for interface in netifaces.interfaces():
 		print interface,
@@ -95,7 +91,6 @@ def getIPMaskMAC(interface):
 	
 	addrs = netifaces.ifaddresses(interface) 	#ifconfig style information
 	
-	#print len(addrs)
 	x = addrs[netifaces.AF_INET] 		#Layer 3
 	
 	#Used pop to knock off dictionary encapsulation
@@ -106,7 +101,14 @@ def getIPMaskMAC(interface):
 	trip = (y["addr"], y["netmask"], z["addr"])
 
 	return trip
-
+'''
+	Uses the Ip address and subnet mask to get a full CIDR representation of the LAN
+	ip: localhost IP address (e.g. 192.168.56.104)
+	mask: subnet mask
+	returns CIDR as a string
+	e.g.
+		192.168.56.0/24
+'''
 def getSubnet(interface):
 	
 	ipMaskMAC = getIPMaskMAC(interface)
