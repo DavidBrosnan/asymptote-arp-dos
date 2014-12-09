@@ -7,6 +7,9 @@ from time import sleep
 from sys import exit
 import netifaces
 
+'''
+	Creates either an attack or recovery packet
+'''
 
 def createPacket(victimIP, victimMAC, deadEndIP, deadEndMAC, poison):
 	
@@ -35,7 +38,12 @@ def createPacket(victimIP, victimMAC, deadEndIP, deadEndMAC, poison):
 	#*************************
 	return pkt
 
-
+'''
+	interface: attack on this interface
+	victims: scanned hosts that will be poisoned
+	quarantine: the machine they will be cut off from
+	verbosity: Controls output
+'''
 def DenialOfService(interface, victims, quarantine, verbosity):
 
 	qIP = quarantine[0]
@@ -43,6 +51,7 @@ def DenialOfService(interface, victims, quarantine, verbosity):
 
 	packets = []
 
+	#Create a personalized attack packet for each host
 	for ip, info in victims.iteritems():
 		packets.append( createPacket(ip,info[0], qIP, qMAC, True) )
 
@@ -61,6 +70,7 @@ def DenialOfService(interface, victims, quarantine, verbosity):
 
 		healPacks = []
 
+		#Create personalized recovery packets
 		for ip, info in victims.iteritems():
 			healPacks.append(createPacket(ip,info[0], qIP, qMAC, False))
 
