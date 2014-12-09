@@ -9,20 +9,25 @@ logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import *
 from netaddr import core, IPNetwork, IPAddress
 '''
-	Takes in a range of IP addresses and returns a list of individual IP's
+	Takes in a varations of representation of a list of IP addresses and returns a list of individual IP's
+	Allows for:
+		Subnet (192.168.56.0/24)
+		Range (192.168.56.102-192.168.56.104)
+		Tuple (192.168.56.115,192.168.56.130,192.168.56.230)
+		Single (192.168.56.20)
 '''
 def parseTargets(IPstring, interface):
 
 	targets = []
 
-	if "/" in IPstring:
+	if "/" in IPstring: #If it's a subnet
 		
 		targets = list(IPNetwork(IPstring))
 			
 		for ip in range(0, len(targets)):
 			targets[ip] = str(targets[ip])
 	
-	elif "-" in IPstring:
+	elif "-" in IPstring: #If it's a range
 		index = IPstring.find("-")
 
 		minIP = IPAddress(IPstring[:index:])
@@ -39,7 +44,7 @@ def parseTargets(IPstring, interface):
 		for ip in range(0, len(targets)):
 			targets[ip] = str(targets[ip])
 
-	elif "," in IPstring:	
+	elif "," in IPstring:	#If its a tuple
 
 		while "," in IPstring:
 			index = IPstring.find(",")
@@ -52,10 +57,10 @@ def parseTargets(IPstring, interface):
 
 		targets.append(IPstring) #should contain the last IP address
 
-	else:
+	else: #Single Target
 		targets.append(IPstring)
 
-	try:
+	try: #Is every target a valid IP address?
 		for target in targets:
 			ip = IPNetwork(target)
 	except core.AddrFormatError:
@@ -68,7 +73,9 @@ def parseTargets(IPstring, interface):
 	
 	return targets
 
-
+'''
+	Scan one specific target on an interface
+'''
 def scanTarget(interface, target):
 
 	target = parseTargets(target, interface)
@@ -103,7 +110,7 @@ def hostDiscover(interface, subnet, host):
 	    
 	for s,r in ans:
 
-		ipDict[r[ARP].psrc] = [r[Ether].src,"Unknown"]
+		ipDict[r[ARP].psrc] = [r[Ether].src,"Unknown"]  # Store IP as key with a value of a MAC and label hostname as unknown
 	
 	return ipDict
 
@@ -119,7 +126,7 @@ def getTargets(interface, targetString, scan, verbose):
 	hostMask = ipMaskMAC[1]
 	hostMAC = ipMaskMAC[2]
 		
-	subnet = getSubnet(interface) #(IP, Mask, MAC)
+	subnet = getSubnet(interface)
 	
 	ipMACList = hostDiscover(interface, subnet, hostIP)
 	
@@ -127,11 +134,12 @@ def getTargets(interface, targetString, scan, verbose):
 
 	ipList = []
 
+	#Construct list of hosts discovered that are within user defined range of desired IP addresses
 	for k, v in ipMACList.iteritems():
 		if k in targets:
 			ipList.append(k)
 	
-	if (scan == 2):
+	if (scan == 2): #Fingerprint OS
 		nm = NmapProcess(ipList,"-O","-sS")
 	
 	else:
@@ -164,9 +172,9 @@ def getTargets(interface, targetString, scan, verbose):
 				else:
 					machines[hosts.address] = [hosts.mac,"UNRESOLVED"]
 			
-			if hosts.address == hostIP: #if it's the host
-				machines[hosts.address][0] = hostMAC
-				machines[hosts.address][1] = "**LocalHost**" + machines[hosts.address][1]
+			#if hosts.address == hostIP: #if it's the host
+			#	machines[hosts.address][0] = hostMAC
+			#	machines[hosts.address][1] = "**LocalHost**" + machines[hosts.address][1]
 
 	if scan != 0:
 		printHosts(machines, subnet, scan)
