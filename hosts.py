@@ -59,13 +59,20 @@ def parseTargets(IPstring, interface):
 		for target in targets:
 			ip = IPNetwork(target)
 	except core.AddrFormatError:
-		sys.stderr.write("\nERROR: Invalid scan range\n\n")
-		sys.exit(0)
-		
+		stderr.write("\nERROR: Invalid scan range\n\n")
+		exit(0)
+	
+	except:
+		stderr.write("\nERROR: problem with inputted IP addresses\n\n")
+		exit(0)
+	
 	return targets
 
 
 def scanTarget(interface, target):
+
+	target = parseTargets(target, interface)
+
 	ans,unans=srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst=target),iface= interface,verbose=0,timeout=3)
 
 	result = ()	
@@ -128,7 +135,7 @@ def getTargets(interface, targetString, scan, verbose):
 		nm = NmapProcess(ipList,"-O","-sS")
 	
 	else:
-		nm = NmapProcess(ipList,"-sn") #Run Nmap scan of online hosts
+		nm = NmapProcess(ipList,"--script nbstat.nse", "-sn") #Run Nmap scan of online hosts
 	
 	rc = nm.run()
 	machines = {}

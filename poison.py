@@ -54,10 +54,10 @@ def DenialOfService(interface, victims, quarantine, verbosity):
 			for pkt in packets:
 				sendp(pkt, iface=interface, verbose=0)
 				
-			time.sleep(2)
+			sleep(2)
 
 	except KeyboardInterrupt:
-		print("Re-ARPing....")
+		print("\nRe-ARPing....")
 
 		healPacks = []
 
@@ -68,7 +68,7 @@ def DenialOfService(interface, victims, quarantine, verbosity):
 			for heal in healPacks:
 				sendp(heal, iface=interface, verbose=0)
 				
-			time.sleep(1)
+			sleep(1)
 
-		sys.exit(0)
+		exit(0)
 

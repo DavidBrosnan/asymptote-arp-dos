@@ -36,11 +36,11 @@ def cli(iface, scan, poison, verbose, iprange):
 		print "Available interfaces: "
 		subnet.printInterfaces()
 		print "\nPlease select an interface"
-		sys.exit(0)
+		exit(0)
 
 	if scan == 0 and poison == 'poison':
 		print("Please scan and/or poison the target")
-		sys.exit(0)
+		exit(0)
 	
 
 	if iprange == 'subnet':
@@ -55,7 +55,7 @@ def cli(iface, scan, poison, verbose, iprange):
 		try:
 			DenialOfService(iface, victims, quarantine, verbose)
 		except IndexError:
-			sys.stderr.write("ERROR:Target does not exist or was not found in scan\n")
+			stderr.write("ERROR:Target does not exist or was not found in scan\n")
 
 if __name__ == '__main__':
     cli()
