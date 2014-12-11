@@ -14,15 +14,16 @@ def MACgen():
 	
 	MAC = ":".join([macList[0],macList[1],macList[2],macList[3],macList[4],macList[5]])
 	
-	if MAC == "ff:ff:ff:ff:ff:ff":
+	if MAC == "ff:ff:ff:ff:ff:ff" or "00:00:00:00:00:00": #Don't want either of these MAC addresses
 		MAC = MACgen()
 
 	return MAC
 '''
+	Converts a 8 bit (0-255) decimal number to a 2 character hex representation
 '''
 def dec2Hex(dec):
 	
-	hexDict = {10:'A', 11:'B', 12:'C', 13:'D', 14:'E', 15:'F'}
+	hexDict = {10:'a', 11:'b', 12:'c', 13:'d', 14:'e', 15:'f'}
 
 	i = (int)(dec / 16)
 	j = (int)(dec % 16)
