@@ -59,7 +59,7 @@ def cli(iface, scan, poison, verbose, mac, iprange):
 	        except core.AddrFormatError:
                 	pass
 		except IndexError:
-			stderr.write("\nERROR: IP address does not exist for designated MAC\n\n")
+			stderr.write("\nERROR: IP address not found on local subnet\n\n")
 			exit(0)		
  		
 
