@@ -14,7 +14,7 @@ def MACgen():
 	
 	MAC = ":".join([macList[0],macList[1],macList[2],macList[3],macList[4],macList[5]])
 	
-	if MAC == "ff:ff:ff:ff:ff:ff"
+	if MAC == "ff:ff:ff:ff:ff:ff":
 		MAC = MACgen()
 
 	return MAC

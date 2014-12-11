@@ -83,3 +83,5 @@ def cli(iface, scan, poison, verbose, mac, iprange):
 			stderr.write("\nERROR: Target does not exist or was not found in scan\n")
 			exit(0)
 
+if __name__ == "__main__":
+	cli()
