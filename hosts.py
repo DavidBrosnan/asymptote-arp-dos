@@ -75,6 +75,7 @@ def parseTargets(IPstring, interface):
 
 '''
 	Scan one specific target on an interface
+	returns targets MAC address
 '''
 def scanTarget(interface, target):
 
@@ -117,7 +118,11 @@ def hostDiscover(interface, subnet, host):
 '''
 	List the hostnames, IP addresses, and MACs of all online hosts in the Local Area Network
 	interface: interface to find online hosts on
-	return void
+	targetString: Range of Ip addresses to scan
+	scan: Intensity of scan
+	verbose: print statements
+	
+	return list of machines
 '''
 def getTargets(interface, targetString, scan, verbose):
 	ipMaskMAC = getIPMaskMAC(interface)
@@ -180,6 +185,14 @@ def getTargets(interface, targetString, scan, verbose):
 		printHosts(machines, subnet, scan)
 	
 	return machines
+	
+'''
+	Print Target Scan
+	
+	machines: list of scanned machines
+	subnet: subnet of the local network
+	scan: scan type used
+'''
 
 def printHosts(machines, subnet, scan):
 	
