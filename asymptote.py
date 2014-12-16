@@ -11,7 +11,7 @@ from netaddr import IPNetwork, EUI, core
 @click.option('-s','--scan', count=True, help="find online hosts (-ss for OS and MAC identification")
 @click.option('-p','--poison', default='poison', help="Quarantine specified IP for IP's within givin range")
 @click.option('-v','--verbose', count=True, help="increase verbosity (-vv for greater effect)")
-@click.option('-m','--MAC', default = 'MAC', help = "Source MAC address for attack\n'rand':random MAC\n'frenzy':random MAC per packet\n'local': local MAC\nIP:Disguise as host\n")
+@click.option('-m','--MAC', default = 'rand', help = "Source MAC address for attack\n'rand':random MAC\n'frenzy':random MAC per packet\n'local': local MAC\nIP:Disguise as host\n")
 @click.argument('iprange', default='subnet')
 def cli(iface, scan, poison, verbose, mac, iprange):
 	"""Asymptote LAN DOS attacker
@@ -75,6 +75,7 @@ def cli(iface, scan, poison, verbose, mac, iprange):
 				test = EUI(mac)
 	
 			except core.AddrFormatError:
+				print mac
 				stderr.write("\nERROR: Invalid MAC address\n\n")
 				exit(0)
 		try:

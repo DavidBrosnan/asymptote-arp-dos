@@ -14,7 +14,7 @@ def MACgen():
 	
 	MAC = ":".join([macList[0],macList[1],macList[2],macList[3],macList[4],macList[5]])
 	
-	if MAC == "ff:ff:ff:ff:ff:ff" or "00:00:00:00:00:00": #Don't want either of these MAC addresses
+	if MAC == "ff:ff:ff:ff:ff:ff" or MAC == "00:00:00:00:00:00": #Don't want either of these MAC addresses
 		MAC = MACgen()
 
 	return MAC
